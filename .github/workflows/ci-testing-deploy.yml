@@ -277,7 +277,7 @@ jobs:
           mkdir --parents /${{ runner.temp }}/build
           make build local-dest=/${{ runner.temp }}/build
       - name: upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -303,7 +303,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -344,7 +344,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -380,7 +380,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -416,7 +416,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -455,7 +455,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -496,7 +496,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -529,7 +529,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -571,7 +571,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -610,7 +610,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -626,7 +626,7 @@ jobs:
         run: ./ci/github/unit-testing/catalog.bash test
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/catalog/test_failures
@@ -655,7 +655,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -704,7 +704,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -720,7 +720,7 @@ jobs:
         run: ./ci/github/unit-testing/datcore-adapter.bash test
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/datcore-adapter/test_failures
@@ -751,7 +751,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -787,7 +787,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -803,7 +803,7 @@ jobs:
         run: ./ci/github/unit-testing/director-v2.bash test
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/director-v2/test_failures
@@ -832,7 +832,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -871,7 +871,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -910,7 +910,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -949,7 +949,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -998,7 +998,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1037,7 +1037,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1076,7 +1076,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1125,7 +1125,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1163,7 +1163,7 @@ jobs:
         with:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
-      - uses: actions/setup-node@v4.0.0
+      - uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ matrix.node }}
           cache: "npm"
@@ -1195,7 +1195,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1228,7 +1228,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1267,7 +1267,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1306,7 +1306,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1345,7 +1345,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1384,7 +1384,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1423,7 +1423,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1463,7 +1463,7 @@ jobs:
       - name: install rclone
         run: sudo ./ci/github/helpers/install_rclone.bash
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1549,13 +1549,13 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
           cache-dependency-path: "services/web/server/requirements/ci.txt"
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1569,7 +1569,7 @@ jobs:
         run: ./ci/github/integration-testing/webserver.bash test 01
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/web/server/test_failures
@@ -1601,7 +1601,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1609,7 +1609,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1623,7 +1623,7 @@ jobs:
         run: ./ci/github/integration-testing/webserver.bash test 02
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/web/server/test_failures
@@ -1655,7 +1655,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1663,7 +1663,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1677,7 +1677,7 @@ jobs:
         run: ./ci/github/integration-testing/director-v2.bash test 01
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/director-v2/test_failures
@@ -1711,7 +1711,7 @@ jobs:
       - name: setup rclone docker volume plugin
         run: sudo ./ci/github/helpers/install_rclone_docker_volume_plugin.bash
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1719,7 +1719,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1735,7 +1735,7 @@ jobs:
         run: ./ci/github/integration-testing/director-v2.bash test 02
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/director-v2/test_failures
@@ -1767,7 +1767,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1775,7 +1775,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1791,7 +1791,7 @@ jobs:
         run: ./ci/github/integration-testing/dynamic-sidecar.bash test 01
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/dynamic-sidecar/test_failures
@@ -1824,7 +1824,7 @@ jobs:
           driver: docker-container
 
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1832,7 +1832,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1858,7 +1858,7 @@ jobs:
           make test-system
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./services/director-v2/test_failures
@@ -1894,13 +1894,13 @@ jobs:
       - name: install rclone
         run: sudo ./ci/github/helpers/install_rclone.bash
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
           cache-dependency-path: "packages/simcore-sdk/requirements/ci.txt"
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1914,7 +1914,7 @@ jobs:
         run: ./ci/github/integration-testing/simcore-sdk.bash test
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./packages/simcore-sdk/test_failures
@@ -1970,7 +1970,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -1978,7 +1978,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -1994,7 +1994,7 @@ jobs:
         run: ./ci/github/system-testing/public-api.bash test
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./test_failures
@@ -2023,7 +2023,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -2031,7 +2031,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -2046,13 +2046,13 @@ jobs:
       - name: dump services setting schemas
         run: export DOCKER_REGISTRY=local; export DOCKER_IMAGE_TAG=production; make settings-schema.json
       - name: upload services settings schemas
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_services_settings_schemas
           path: ./services/**/settings-schema.json
       - name: upload failed tests logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./test_failures
@@ -2082,12 +2082,12 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
           cache-dependency-path: "tests/e2e/requirements/requirements.txt"
-      - uses: actions/setup-node@v4.0.0
+      - uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ matrix.node }}
           cache: "npm"
@@ -2095,7 +2095,7 @@ jobs:
       - name: expose github runtime for buildx
         uses: crazy-max/ghaction-github-runtime@v3
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
@@ -2113,19 +2113,19 @@ jobs:
         run: ./ci/github/system-testing/e2e.bash dump_docker_logs
       - name: upload docker logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_docker_logs
           path: ./tests/e2e/test_failures
       - name: upload screenshots
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_screenshots
           path: tests/e2e/screenshots
       - name: upload e2e logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.job }}_logs
           path: tests/e2e/logs
@@ -2152,7 +2152,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: setup python environment
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: "pip"
@@ -2213,7 +2213,7 @@ jobs:
           version: ${{ matrix.docker_buildx }}
           driver: docker-container
       - name: download docker images
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-buildx-images-${{ runner.os }}-${{ github.sha }}
           path: /${{ runner.temp }}/build
