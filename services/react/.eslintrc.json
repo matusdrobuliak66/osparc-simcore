@@ -1,0 +1,12 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "max-len": "off",
+    "object-curly-newline": "off",
+    "object-property-newline": "off",
+    "curly": "off",
+    "no-undef": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "indent": "off"
+  }
+}
