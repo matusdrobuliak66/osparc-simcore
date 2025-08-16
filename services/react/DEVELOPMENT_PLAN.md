@@ -4,8 +4,9 @@
 Building a React frontend for oSPARC with authentication and dashboard functionality.
 
 ## API Configuration
-- **Base URL (local development)**: `http://10.43.103.145.nip.io:9081`
+- **Base URL (local development)**: `/api/proxy` (proxied to `http://10.43.103.145.nip.io:9081`)
 - **API Version**: `/v0`
+- **CORS Solution**: Using Next.js rewrites to proxy requests and avoid CORS issues
 
 ## Authentication Endpoints
 Based on OpenAPI specification:
