@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Forward the request to the backend with all cookies
-    const backendUrl = 'http://10.43.103.145.nip.io:9081/v0/projects';
+    const backendUrl = 'http://10.43.103.145.nip.io:9081/v0/workspaces';
     const url = new URL(backendUrl);
 
     // Copy query parameters from the original request
@@ -51,9 +51,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const backendUrl = 'http://10.43.103.145.nip.io:9081/v0/projects';
+    const backendUrl = 'http://10.43.103.145.nip.io:9081/v0/workspaces';
 
-    console.log('Creating project with body:', body);
+    console.log('Creating workspace with body:', body);
     console.log('Request cookies:', request.headers.get('cookie'));
 
     const response = await fetch(backendUrl, {

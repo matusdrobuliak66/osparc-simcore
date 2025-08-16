@@ -5,11 +5,15 @@ import { ProjectsApi } from '@/lib/projects-api';
 import { ProjectListItem, ProjectFilters, ProjectsPage } from '@/types/projects';
 import ProjectCard from './ProjectCard';
 import DashboardFilters from './DashboardFilters';
+import CreateProjectModal from './CreateProjectModal';
+import CreateWorkspaceModal from './CreateWorkspaceModal';
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+  const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
   const [pagination, setPagination] = useState({
     total: 0,
     count: 0,
@@ -65,6 +69,16 @@ export default function Dashboard() {
     setFilters({ ...newFilters, offset: 0 }); // Reset to first page when filters change
   };
 
+  const handleProjectCreated = () => {
+    // Refresh the projects list
+    loadProjects(filters);
+  };
+
+  const handleWorkspaceCreated = () => {
+    // For now just log, later we might want to refresh workspaces list
+    console.log('Workspace created successfully');
+  };
+
   const handleProjectClick = (project: ProjectListItem) => {
     // TODO: Navigate to project details or open project
     console.log('Project clicked:', project);
@@ -112,9 +126,31 @@ export default function Dashboard() {
     <div className="py-6 px-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {getWorkspaceDisplayName()}
-        </h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {getWorkspaceDisplayName()}
+          </h1>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsCreateWorkspaceModalOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Workspace
+            </button>
+            <button
+              onClick={() => setIsCreateProjectModalOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Project
+            </button>
+          </div>
+        </div>
         <p className="text-gray-600">
           {filters.workspaceId === null
             ? 'Your personal projects and studies'
@@ -162,6 +198,17 @@ export default function Dashboard() {
                   ? "You don't have any projects yet"
                   : 'No shared projects available'}
               </p>
+              {!filters.search && filters.workspaceId === null && (
+                <button
+                  onClick={() => setIsCreateProjectModalOpen(true)}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Create Your First Project
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -204,6 +251,18 @@ export default function Dashboard() {
           )}
         </>
       ) : null}
+
+      {/* Modals */}
+      <CreateProjectModal
+        isOpen={isCreateProjectModalOpen}
+        onClose={() => setIsCreateProjectModalOpen(false)}
+        onProjectCreated={handleProjectCreated}
+      />
+      <CreateWorkspaceModal
+        isOpen={isCreateWorkspaceModalOpen}
+        onClose={() => setIsCreateWorkspaceModalOpen(false)}
+        onWorkspaceCreated={handleWorkspaceCreated}
+      />
     </div>
   );
 }

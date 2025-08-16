@@ -73,3 +73,10 @@ export interface ProjectSearchParams extends ProjectFilters {
   limit?: number;
   offset?: number;
 }
+
+export interface CreateProjectData {
+  name: string;
+  description?: string;
+  workbench?: Record<string, any>;
+  accessRights?: Record<string, AccessRights>;
+}
