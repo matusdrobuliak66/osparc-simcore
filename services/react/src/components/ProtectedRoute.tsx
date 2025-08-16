@@ -14,39 +14,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading...</p>
-
-        <style jsx>{`
-          .loading-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-          }
-
-          .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-          }
-
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-
-          p {
-            color: #666;
-            font-size: 16px;
-          }
-        `}</style>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   }

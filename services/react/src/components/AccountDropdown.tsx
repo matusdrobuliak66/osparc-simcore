@@ -30,206 +30,68 @@ export default function AccountDropdown() {
   }
 
   return (
-    <div className="account-dropdown" ref={dropdownRef}>
+    <div className="relative inline-block" ref={dropdownRef}>
       <button
-        className="account-button"
+        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all disabled:opacity-60 disabled:cursor-not-allowed text-sm"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
       >
-        <div className="user-avatar">
+        <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
           {user.email.charAt(0).toUpperCase()}
         </div>
-        <span className="user-email">{user.email}</span>
+        <span className="text-gray-700 max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
+          {user.email}
+        </span>
         <svg
-          className={`dropdown-icon ${isOpen ? 'open' : ''}`}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
+          className={`w-4 h-4 text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
           <path
-            d="M4 6L8 10L12 6"
-            stroke="currentColor"
-            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
           />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="dropdown-menu">
-          <div className="dropdown-header">
-            <div className="user-info">
-              <div className="user-email-full">{user.email}</div>
-              <div className="user-status">Signed in</div>
+        <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg min-w-64 z-50">
+          <div className="p-4">
+            <div className="flex flex-col gap-1">
+              <div className="font-medium text-gray-900 text-sm">
+                {user.email}
+              </div>
+              <div className="text-xs text-gray-500">
+                Signed in
+              </div>
             </div>
           </div>
-          <div className="dropdown-divider"></div>
+          <div className="border-t border-gray-100 mx-4"></div>
           <button
-            className="dropdown-item logout-item"
+            className="flex items-center gap-2 w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed rounded-b-lg"
             onClick={handleLogout}
             disabled={isLoading}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
-                d="M6 13L1 13L1 3L6 3"
-                stroke="currentColor"
-                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-              />
-              <path
-                d="M11 9L15 5L11 1"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M15 5L4 5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
             {isLoading ? 'Signing out...' : 'Sign out'}
           </button>
         </div>
       )}
-
-      <style jsx>{`
-        .account-dropdown {
-          position: relative;
-          display: inline-block;
-        }
-
-        .account-button {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
-          background: white;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-size: 14px;
-        }
-
-        .account-button:hover:not(:disabled) {
-          background-color: #f8f9fa;
-          border-color: #adb5bd;
-        }
-
-        .account-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .user-avatar {
-          width: 32px;
-          height: 32px;
-          background-color: #007bff;
-          color: white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          font-size: 14px;
-        }
-
-        .user-email {
-          color: #333;
-          max-width: 200px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .dropdown-icon {
-          color: #666;
-          transition: transform 0.2s;
-        }
-
-        .dropdown-icon.open {
-          transform: rotate(180deg);
-        }
-
-        .dropdown-menu {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          margin-top: 4px;
-          background: white;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 250px;
-          z-index: 1000;
-        }
-
-        .dropdown-header {
-          padding: 12px 16px;
-        }
-
-        .user-info {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .user-email-full {
-          font-weight: 500;
-          color: #333;
-          font-size: 14px;
-        }
-
-        .user-status {
-          font-size: 12px;
-          color: #666;
-        }
-
-        .dropdown-divider {
-          height: 1px;
-          background-color: #eee;
-          margin: 0 16px;
-        }
-
-        .dropdown-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          width: 100%;
-          padding: 12px 16px;
-          background: none;
-          border: none;
-          text-align: left;
-          cursor: pointer;
-          transition: background-color 0.2s;
-          font-size: 14px;
-        }
-
-        .dropdown-item:hover:not(:disabled) {
-          background-color: #f8f9fa;
-        }
-
-        .dropdown-item:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .logout-item {
-          color: #dc3545;
-          border-radius: 0 0 7px 7px;
-        }
-
-        .logout-item:hover:not(:disabled) {
-          background-color: #fff5f5;
-        }
-      `}</style>
     </div>
   );
 }

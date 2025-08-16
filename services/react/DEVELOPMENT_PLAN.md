@@ -42,6 +42,9 @@ Based on OpenAPI specification:
 - [x] Create account dropdown component for logout
 - [x] Implement authentication flow
 - [x] Add protected route wrapper
+- [x] Configure CORS proxy in Next.js
+- [x] Install and configure Tailwind CSS
+- [x] Refactor all components to use Tailwind utility classes
 - [x] Basic testing of components
 - [ ] Test with real backend API endpoints
 - [ ] Handle edge cases and error states
@@ -74,7 +77,8 @@ Based on OpenAPI specification:
 - TypeScript for type safety
 - Fetch API for HTTP requests
 - Local storage for session persistence
-- CSS modules or styled-components for styling
+- **Tailwind CSS v3** for styling (utility-first approach)
+- Next.js proxy for CORS handling
 
 ### Files to Create/Modify:
 - `src/lib/api.ts` - API utilities

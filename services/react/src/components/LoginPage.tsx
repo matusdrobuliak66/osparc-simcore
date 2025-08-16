@@ -29,16 +29,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Welcome to oSPARC</h1>
-          <p>Please sign in to continue</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Welcome to oSPARC
+          </h1>
+          <p className="text-sm text-gray-600">
+            Please sign in to continue
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Email
+            </label>
             <input
               id="email"
               type="email"
@@ -47,11 +56,17 @@ export default function LoginPage() {
               placeholder="Enter your email"
               required
               disabled={isLoading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -60,126 +75,25 @@ export default function LoginPage() {
               placeholder="Enter your password"
               required
               disabled={isLoading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             />
           </div>
 
           {error && (
-            <div className="error-message">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
               {error}
             </div>
           )}
 
           <button
             type="submit"
-            className="login-button"
             disabled={isLoading || !email || !password}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
       </div>
-
-      <style jsx>{`
-        .login-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #f5f5f5;
-          padding: 20px;
-        }
-
-        .login-card {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          padding: 40px;
-          width: 100%;
-          max-width: 400px;
-        }
-
-        .login-header {
-          text-align: center;
-          margin-bottom: 30px;
-        }
-
-        .login-header h1 {
-          color: #333;
-          font-size: 24px;
-          margin-bottom: 8px;
-        }
-
-        .login-header p {
-          color: #666;
-          font-size: 14px;
-        }
-
-        .login-form {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .form-group label {
-          font-weight: 500;
-          color: #333;
-          font-size: 14px;
-        }
-
-        .form-group input {
-          padding: 12px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 16px;
-          transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-          outline: none;
-          border-color: #007bff;
-        }
-
-        .form-group input:disabled {
-          background-color: #f8f9fa;
-          cursor: not-allowed;
-        }
-
-        .error-message {
-          background-color: #fee;
-          color: #c33;
-          padding: 10px;
-          border-radius: 4px;
-          font-size: 14px;
-          border: 1px solid #fcc;
-        }
-
-        .login-button {
-          background-color: #007bff;
-          color: white;
-          border: none;
-          padding: 12px;
-          border-radius: 4px;
-          font-size: 16px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background-color 0.2s;
-        }
-
-        .login-button:hover:not(:disabled) {
-          background-color: #0056b3;
-        }
-
-        .login-button:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-      `}</style>
     </div>
   );
 }
