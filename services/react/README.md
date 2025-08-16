@@ -1,148 +1,36 @@
-# oSPARC Simcore Frontend
-
-A modern React frontend application for managing oSPARC projects, built with Next.js, TypeScript, and Tailwind CSS.
-
-## Features
-
-- **Dashboard View**: Clean, modern interface displaying all your projects
-- **Project Management**: View, create, edit, and delete projects
-- **Search & Filtering**: Powerful search and filtering capabilities including:
-  - Search by project name, description, or owner
-  - Filter by project type (user projects, templates)
-  - Filter by project status
-  - Filter by tags and classifiers
-  - Filter by owner and date range
-- **Account Management**: User profile management with account dropdown
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-
-## Technology Stack
-
-- **Framework**: Next.js 15.4.6 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **HTTP Client**: Axios
-- **Linting**: ESLint with Next.js configuration
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js app directory
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout component
-│   └── page.tsx           # Main dashboard page
-├── components/            # Reusable UI components
-│   ├── Header.tsx         # Navigation header with search and user menu
-│   ├── ProjectCard.tsx    # Individual project card component
-│   └── DashboardFilters.tsx # Filter controls component
-├── lib/                   # Utility libraries
-│   └── api.ts            # API client for backend communication
-└── types/                 # TypeScript type definitions
-    └── api.ts            # API response types based on OpenAPI spec
-```
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 18.0 or later
-- npm, yarn, pnpm, or bun
-
-### Installation
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Create environment file:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-3. Update environment variables:
-   ```bash
-   NEXT_PUBLIC_API_URL=http://localhost:8080
-   ```
-
-### Development
-
-Start the development server:
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Building for Production
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-Create a production build:
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-```bash
-npm run build
-```
+## Learn More
 
-Start the production server:
+To learn more about Next.js, take a look at the following resources:
 
-```bash
-npm start
-```
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## API Integration
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-The application integrates with the oSPARC backend API. Key endpoints used:
+## Deploy on Vercel
 
-- `GET /v0/projects` - List projects with filtering and search
-- `GET /v0/projects/{project_id}` - Get specific project details
-- `POST /v0/projects` - Create new project
-- `PUT /v0/projects/{project_id}` - Update project
-- `DELETE /v0/projects/{project_id}` - Delete project
-- `GET /v0/me` - Get user profile
-- `PUT /v0/me` - Update user profile
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Environment Variables
-
-- `NEXT_PUBLIC_API_URL` - Base URL for the oSPARC backend API
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Create production build
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-## Features in Detail
-
-### Dashboard
-- Grid and list view modes
-- Project cards showing thumbnail, status, owner, and metadata
-- Real-time search with debouncing
-- Responsive layout
-
-### Filtering & Search
-- Multi-level filtering system
-- Search across project names, descriptions, and owners
-- Status-based filtering
-- Tag and classifier filtering
-- Date range filtering
-- Clear all filters functionality
-
-### User Management
-- User profile display with initials avatar
-- Account dropdown menu
-- Profile and settings access
-- Logout functionality
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Submit a pull request
-
-## License
-
-This project is part of the oSPARC platform. See the main repository for license information.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
