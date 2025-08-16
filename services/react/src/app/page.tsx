@@ -2,6 +2,7 @@
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AccountDropdown from '@/components/AccountDropdown';
+import Dashboard from '@/components/Dashboard';
 
 export default function Home() {
   return (
@@ -23,15 +24,8 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="py-10 px-6 max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-10 text-center">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-              Welcome to oSPARC!
-            </h2>
-            <p className="text-gray-600 text-lg leading-relaxed">
-              You are successfully logged in. The dashboard will be built in the next phase.
-            </p>
-          </div>
+        <main>
+          <Dashboard />
         </main>
       </div>
     </ProtectedRoute>
