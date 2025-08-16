@@ -7,6 +7,7 @@ import ProjectCard from './ProjectCard';
 import DashboardFilters from './DashboardFilters';
 import CreateProjectModal from './CreateProjectModal';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
+import WorkspaceSelector from './WorkspaceSelector';
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
@@ -28,6 +29,10 @@ export default function Dashboard() {
     limit: 20,
     offset: 0,
   });
+
+  // Track if we're in shared mode and if a workspace has been selected
+  const [isSharedMode, setIsSharedMode] = useState(false);
+  const [selectedSharedWorkspaceId, setSelectedSharedWorkspaceId] = useState<string | null>(null);
 
   const loadProjects = useCallback(async (currentFilters: ProjectFilters) => {
     try {
@@ -67,6 +72,17 @@ export default function Dashboard() {
 
   const handleFiltersChange = (newFilters: ProjectFilters) => {
     setFilters({ ...newFilters, offset: 0 }); // Reset to first page when filters change
+
+    // Check if workspace mode changed
+    if (newFilters.workspaceId === null && isSharedMode) {
+      // Switched to private mode
+      setIsSharedMode(false);
+      setSelectedSharedWorkspaceId(null);
+    } else if (newFilters.workspaceId === undefined && !isSharedMode) {
+      // Switched to shared mode but no workspace selected yet
+      setIsSharedMode(true);
+      setSelectedSharedWorkspaceId(null);
+    }
   };
 
   const handleProjectCreated = () => {
@@ -77,6 +93,16 @@ export default function Dashboard() {
   const handleWorkspaceCreated = () => {
     // For now just log, later we might want to refresh workspaces list
     console.log('Workspace created successfully');
+  };
+
+  const handleWorkspaceSelect = (workspaceId: string | null) => {
+    setSelectedSharedWorkspaceId(workspaceId);
+    // Update filters to load projects from the selected workspace
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      workspaceId: workspaceId,
+      offset: 0
+    }));
   };
 
   const handleProjectClick = (project: ProjectListItem) => {
@@ -90,7 +116,13 @@ export default function Dashboard() {
   };
 
   const getWorkspaceDisplayName = () => {
-    return filters.workspaceId === null ? 'Private Workspace' : 'Shared Workspaces';
+    if (filters.workspaceId === null) {
+      return 'Private Workspace';
+    } else if (isSharedMode && selectedSharedWorkspaceId === null) {
+      return 'Shared Workspaces';
+    } else {
+      return 'Shared Workspace';
+    }
   };
 
   if (error) {
@@ -154,6 +186,8 @@ export default function Dashboard() {
         <p className="text-gray-600">
           {filters.workspaceId === null
             ? 'Your personal projects and studies'
+            : isSharedMode && selectedSharedWorkspaceId === null
+            ? 'Select a shared workspace to view its projects'
             : 'Shared projects across your organization'}
         </p>
       </div>
@@ -165,8 +199,17 @@ export default function Dashboard() {
         isLoading={loading}
       />
 
+      {/* Workspace Selector - Show when in shared mode but no workspace selected */}
+      {isSharedMode && selectedSharedWorkspaceId === null && (
+        <WorkspaceSelector
+          selectedWorkspaceId={selectedSharedWorkspaceId}
+          onWorkspaceSelect={handleWorkspaceSelect}
+          isLoading={loading}
+        />
+      )}
+
       {/* Loading State */}
-      {loading && projects.length === 0 && (
+      {loading && projects.length === 0 && (filters.workspaceId !== undefined || !isSharedMode) && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -175,8 +218,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Projects Grid */}
-      {!loading || projects.length > 0 ? (
+      {/* Projects Grid - Only show when we have a valid workspace selection */}
+      {(!loading || projects.length > 0) && (filters.workspaceId !== undefined || !isSharedMode) ? (
         <>
           {projects.length === 0 ? (
             <div className="text-center py-12">

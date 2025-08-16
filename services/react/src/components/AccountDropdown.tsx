@@ -29,6 +29,10 @@ export default function AccountDropdown() {
     return null;
   }
 
+  // Get user display info with fallbacks
+  const userEmail = user.email || (user as any).login || 'User';
+  const userInitial = userEmail.charAt(0).toUpperCase();
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
       <button
@@ -37,10 +41,10 @@ export default function AccountDropdown() {
         disabled={isLoading}
       >
         <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
-          {user.email.charAt(0).toUpperCase()}
+          {userInitial}
         </div>
         <span className="text-gray-700 max-w-48 overflow-hidden text-ellipsis whitespace-nowrap">
-          {user.email}
+          {userEmail}
         </span>
         <svg
           className={`w-4 h-4 text-gray-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -62,7 +66,7 @@ export default function AccountDropdown() {
           <div className="p-4">
             <div className="flex flex-col gap-1">
               <div className="font-medium text-gray-900 text-sm">
-                {user.email}
+                {userEmail}
               </div>
               <div className="text-xs text-gray-500">
                 Signed in

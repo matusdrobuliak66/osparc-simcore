@@ -3,8 +3,9 @@ const API_BASE_URL = '/api/proxy';
 const API_VERSION = 'v0';
 
 export const API_ENDPOINTS = {
-  LOGIN: `${API_BASE_URL}/${API_VERSION}/auth/login`,
-  LOGOUT: `${API_BASE_URL}/${API_VERSION}/auth/logout`,
+  LOGIN: `/api/auth/login`,
+  LOGOUT: `/api/auth/logout`,
+  AUTH_CHECK: `/api/auth/check`,
   PROJECTS: `/api/projects`, // Use our custom API route for better cookie handling
   PROJECTS_SEARCH: `${API_BASE_URL}/${API_VERSION}/projects:search`,
   WORKSPACES: `/api/workspaces`, // Use our custom API route for better cookie handling

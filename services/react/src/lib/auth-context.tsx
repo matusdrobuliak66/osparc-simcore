@@ -77,14 +77,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Check for existing session on mount
   useEffect(() => {
-    const checkExistingSession = () => {
+    const checkExistingSession = async () => {
       try {
-        const savedUser = localStorage.getItem(SESSION_KEYS.USER);
-        const savedSessionId = localStorage.getItem(SESSION_KEYS.SESSION_ID);
-
-        if (savedUser && savedSessionId) {
-          const user = JSON.parse(savedUser);
-          dispatch({ type: 'SET_USER', payload: user });
+        // Check if user is authenticated by calling the backend
+        const response = await authApi.checkAuth();
+        if (response.authenticated && response.user) {
+          dispatch({ type: 'SET_USER', payload: response.user });
         } else {
           dispatch({ type: 'SET_LOADING', payload: false });
         }
@@ -104,17 +102,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await authApi.login({ email, password });
 
-      // Create user object (since API doesn't return user details)
-      const user: User = { email };
+      // After successful login, check authentication status to get user data
+      const authCheck = await authApi.checkAuth();
 
-      // Generate and store session ID
-      const sessionId = generateSessionId();
-
-      // Store in localStorage
-      localStorage.setItem(SESSION_KEYS.USER, JSON.stringify(user));
-      localStorage.setItem(SESSION_KEYS.SESSION_ID, sessionId);
-
-      dispatch({ type: 'SET_USER', payload: user });
+      if (authCheck.authenticated && authCheck.user) {
+        dispatch({ type: 'SET_USER', payload: authCheck.user });
+      } else {
+        throw new Error('Authentication failed after login');
+      }
     } catch (error) {
       const message = error instanceof ApiError
         ? error.message
@@ -127,17 +122,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     dispatch({ type: 'SET_LOADING', payload: true });
 
     try {
-      const sessionId = localStorage.getItem(SESSION_KEYS.SESSION_ID);
+      const sessionId = generateSessionId(); // Just generate a dummy session ID
 
-      if (sessionId) {
-        // Call logout API
-        await authApi.logout({ client_session_id: sessionId });
-      }
+      // Call logout API
+      await authApi.logout({ client_session_id: sessionId });
     } catch (error) {
       console.error('Logout API call failed:', error);
       // Continue with logout even if API call fails
     } finally {
-      // Clear localStorage and state
+      // Clear any localStorage and state
       localStorage.removeItem(SESSION_KEYS.USER);
       localStorage.removeItem(SESSION_KEYS.SESSION_ID);
       dispatch({ type: 'LOGOUT' });

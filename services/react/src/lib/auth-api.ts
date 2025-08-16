@@ -3,7 +3,8 @@ import type {
   LoginRequest,
   LoginResponse,
   LogoutRequest,
-  LogoutResponse
+  LogoutResponse,
+  AuthCheckResponse
 } from '@/types/auth';
 
 export const authApi = {
@@ -19,5 +20,12 @@ export const authApi = {
    */
   async logout(sessionData: LogoutRequest): Promise<LogoutResponse> {
     return ApiClient.post<LogoutResponse>(API_ENDPOINTS.LOGOUT, sessionData);
+  },
+
+  /**
+   * Check if user is authenticated
+   */
+  async checkAuth(): Promise<AuthCheckResponse> {
+    return ApiClient.get<AuthCheckResponse>(API_ENDPOINTS.AUTH_CHECK);
   },
 };

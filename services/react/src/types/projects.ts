@@ -60,7 +60,7 @@ export interface ProjectFilters {
   showHidden?: boolean;
   search?: string;
   folderId?: number | null;
-  workspaceId?: number | null;
+  workspaceId?: string | number | null;
   text?: string;
   tagIds?: string;
   orderBy?: string;

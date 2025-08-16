@@ -27,6 +27,11 @@ export interface LogoutResponse {
   error: null;
 }
 
+export interface AuthCheckResponse {
+  authenticated: boolean;
+  user: User | null;
+}
+
 export interface User {
   email: string;
   // Add more user fields as needed based on actual API response
