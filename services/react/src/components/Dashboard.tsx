@@ -72,7 +72,6 @@ export default function Dashboard() {
 
   const handleFiltersChange = (newFilters: ProjectFilters) => {
     setFilters({ ...newFilters, offset: 0 }); // Reset to first page when filters change
-    setCurrentWorkspaceId(typeof newFilters.workspaceId === 'string' ? newFilters.workspaceId : null);
   };
 
   const handleProjectCreated = () => {
@@ -86,18 +85,24 @@ export default function Dashboard() {
   };
 
   const handleWorkspaceSelect = (workspaceId: string | null, workspaceName?: string) => {
+    console.log('=== Dashboard handleWorkspaceSelect START ===');
+    console.log('workspaceId parameter:', workspaceId, typeof workspaceId);
+    console.log('workspaceName parameter:', workspaceName, typeof workspaceName);
+
     setCurrentWorkspaceId(workspaceId);
     setCurrentWorkspaceName(workspaceName || (workspaceId ? 'Shared Workspace' : 'Private Workspace'));
 
     // Update filters to load projects from the selected workspace
-    setFilters(prevFilters => ({
-      ...prevFilters,
+    const newFilters = {
+      ...filters,
       workspaceId: workspaceId,
       offset: 0
-    }));
-  };
-
-  const handleProjectClick = (project: ProjectListItem) => {
+    };
+    console.log('Current filters before update:', filters);
+    console.log('New filters after update:', newFilters);
+    console.log('=== Dashboard handleWorkspaceSelect END ===');
+    setFilters(newFilters);
+  };  const handleProjectClick = (project: ProjectListItem) => {
     // TODO: Navigate to project details or open project
     console.log('Project clicked:', project);
   };

@@ -1,5 +1,5 @@
 export interface Workspace {
-  gid: string;
+  workspaceId: string;
   name: string;
   description?: string;
   thumbnail?: string;

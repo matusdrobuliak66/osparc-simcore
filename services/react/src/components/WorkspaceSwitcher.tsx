@@ -27,6 +27,20 @@ export default function WorkspaceSwitcher({
     try {
       setLoadingWorkspaces(true);
       const response = await WorkspacesApi.listWorkspaces();
+      console.log('=== WORKSPACE API RESPONSE ===');
+      console.log('Full response:', response);
+      console.log('Response data:', response.data);
+      console.log('Number of workspaces:', response.data?.length || 0);
+
+      if (response.data && response.data.length > 0) {
+        console.log('First workspace keys:', Object.keys(response.data[0]));
+        console.log('First workspace values:', Object.values(response.data[0]));
+        response.data.forEach((workspace, idx) => {
+          console.log(`Workspace ${idx}:`, workspace);
+        });
+      }
+      console.log('=== END WORKSPACE API RESPONSE ===');
+
       setWorkspaces(response.data || []);
     } catch (err) {
       console.error('Failed to load workspaces:', err);
@@ -37,12 +51,17 @@ export default function WorkspaceSwitcher({
 
   const getCurrentWorkspaceName = () => {
     if (currentWorkspaceId === null) return 'Private Workspace';
-    const workspace = workspaces.find(w => w.gid === currentWorkspaceId);
+    const workspace = workspaces.find(w => w.workspaceId === currentWorkspaceId);
     return workspace ? workspace.name : 'Unknown Workspace';
   };
 
   const handleWorkspaceSelect = (workspaceId: string | null, workspaceName: string) => {
+    console.log('=== WorkspaceSwitcher handleWorkspaceSelect START ===');
+    console.log('workspaceId parameter:', workspaceId, typeof workspaceId);
+    console.log('workspaceName parameter:', workspaceName, typeof workspaceName);
+    console.log('About to call onWorkspaceSelect with:', workspaceId, workspaceName);
     onWorkspaceSelect(workspaceId, workspaceName);
+    console.log('=== WorkspaceSwitcher handleWorkspaceSelect END ===');
     setIsOpen(false);
   };
 
@@ -118,29 +137,38 @@ export default function WorkspaceSwitcher({
                   <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Shared Workspaces
                   </div>
-                  {workspaces.map((workspace) => (
-                    <button
-                      key={workspace.gid}
-                      onClick={() => handleWorkspaceSelect(workspace.gid, workspace.name)}
-                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
-                        currentWorkspaceId === workspace.gid ? 'bg-primary-50 text-primary-700' : ''
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <div className="w-5 h-5 mr-3 text-gray-500">
-                          <svg fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                          </svg>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">{workspace.name}</div>
-                          {workspace.description && (
-                            <div className="text-sm text-gray-600 truncate">{workspace.description}</div>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                    {workspaces.map((workspace, idx) => {
+                      console.log(`Workspace ${idx}:`, workspace);
+                      console.log(`Workspace workspaceId:`, workspace.workspaceId, typeof workspace.workspaceId);
+                      console.log(`Workspace name:`, workspace.name, typeof workspace.name);
+                      return (
+                        <button
+                          key={workspace.workspaceId ?? idx}
+                          onClick={() => {
+                            console.log('Button clicked for workspace:', workspace);
+                            console.log('About to call handleWorkspaceSelect with:', workspace.workspaceId, workspace.name);
+                            handleWorkspaceSelect(workspace.workspaceId, workspace.name);
+                          }}
+                          className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                            currentWorkspaceId === workspace.workspaceId ? 'bg-primary-50 text-primary-700' : ''
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <div className="w-5 h-5 mr-3 text-gray-500">
+                              <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">{workspace.name}</div>
+                              {workspace.description && (
+                                <div className="text-sm text-gray-600 truncate">{workspace.description}</div>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
                 </div>
               )}
             </>

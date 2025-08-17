@@ -8,8 +8,9 @@ interface DashboardFiltersProps {
   filters: {
     search?: string;
     type?: 'all' | 'user' | 'template';
+    workspaceId?: string | number | null;
   };
-  onFiltersChange: (filters: { search?: string; type?: 'all' | 'user' | 'template' }) => void;
+  onFiltersChange: (filters: { search?: string; type?: 'all' | 'user' | 'template'; workspaceId?: string | number | null }) => void;
   currentWorkspaceId: string | null;
   onWorkspaceSelect: (workspaceId: string | null, workspaceName?: string) => void;
   isLoading?: boolean;

@@ -17,7 +17,11 @@ export class ProjectsApi {
       searchParams.append('folder_id', params.folderId?.toString() || 'null');
     }
     if (params.workspaceId !== undefined) {
-      searchParams.append('workspace_id', params.workspaceId?.toString() || 'null');
+      if (params.workspaceId === null) {
+        searchParams.append('workspace_id', 'null');
+      } else {
+        searchParams.append('workspace_id', params.workspaceId.toString());
+      }
     }
 
     // Add default order_by if not specified
@@ -42,6 +46,16 @@ export class ProjectsApi {
     if (params.templateType) searchParams.append('template_type', params.templateType);
     if (params.text) searchParams.append('text', params.text);
     if (params.tagIds) searchParams.append('tag_ids', params.tagIds);
+    if (params.folderId !== undefined) {
+      searchParams.append('folder_id', params.folderId?.toString() || 'null');
+    }
+    if (params.workspaceId !== undefined) {
+      if (params.workspaceId === null) {
+        searchParams.append('workspace_id', 'null');
+      } else {
+        searchParams.append('workspace_id', params.workspaceId.toString());
+      }
+    }
 
     // Add default order_by if not specified
     const orderBy = params.orderBy || '{"field":"last_change_date","direction":"desc"}';
