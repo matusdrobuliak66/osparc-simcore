@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProjectsApi } from '@/lib/projects-api';
 import { CreateProjectData } from '@/types/projects';
 
@@ -27,6 +27,14 @@ export default function CreateProjectModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Update formData when workspaceId prop changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      workspaceId: workspaceId,
+    }));
+  }, [workspaceId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -44,6 +52,7 @@ export default function CreateProjectModal({
         description: formData.description ? formData.description.trim() || undefined : undefined,
         workbench: {},
         accessRights: {},
+        workspaceId: workspaceId,
       });
 
       // Reset form
