@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProjectsApi } from '@/lib/projects-api';
 import { Project } from '@/types/projects';
 
@@ -15,6 +16,7 @@ export default function ProjectDetailsModal({
   onClose,
   projectUuid,
 }: ProjectDetailsModalProps) {
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
@@ -51,9 +53,8 @@ export default function ProjectDetailsModal({
 
       await ProjectsApi.openProject(projectUuid);
 
-      // TODO: Navigate to project pipeline view
-      console.log('Project opened successfully. Navigation to pipeline view will be implemented in next iteration.');
-
+      // Navigate to project pipeline view
+      router.push(`/project/${projectUuid}`);
       onClose();
     } catch (err) {
       console.error('Failed to open project:', err);

@@ -5,12 +5,41 @@ export interface Project {
   thumbnail: string;
   type: ProjectType;
   templateType: ProjectTemplateType | null;
-  workbench: Record<string, any>;
+  workbench: Record<string, WorkbenchNode>;
+  ui: ProjectUI;
   prjOwner: string;
   accessRights: Record<string, AccessRights>;
   creationDate: string;
   lastChangeDate: string;
   state: ProjectState;
+}
+
+export interface WorkbenchNode {
+  key: string;
+  version: string;
+  label: string;
+  inputs?: Record<string, any>;
+  outputs?: Record<string, any>;
+  inputNodes?: string[];
+  outputNodes?: string[];
+  thumbnail?: string;
+  runHash?: string | null;
+  state?: {
+    currentStatus: string;
+    dependencies?: string[];
+  };
+}
+
+export interface NodePosition {
+  x: number;
+  y: number;
+}
+
+export interface ProjectUI {
+  workbench?: Record<string, NodePosition>;
+  slideshow?: any;
+  currentNodeId?: string;
+  mode?: string;
 }
 
 export interface ProjectListItem {
