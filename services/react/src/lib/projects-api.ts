@@ -1,5 +1,6 @@
 import { ApiClient, API_ENDPOINTS } from './api';
-import { ProjectsPage, ProjectSearchParams, CreateProjectData } from '@/types/projects';
+import { ProjectsPage, ProjectSearchParams, CreateProjectData, Project } from '@/types/projects';
+import { SessionManager } from './session';
 
 export class ProjectsApi {
   /**
@@ -73,5 +74,33 @@ export class ProjectsApi {
    */
   static async createProject(projectData: CreateProjectData): Promise<any> {
     return ApiClient.post(API_ENDPOINTS.PROJECTS, projectData);
+  }
+
+  /**
+   * Get a single project by UUID
+   */
+  static async getProject(projectUuid: string): Promise<{ data: Project }> {
+    const url = `${API_ENDPOINTS.PROJECTS}/${projectUuid}`;
+    return ApiClient.get<{ data: Project }>(url);
+  }
+
+  /**
+   * Open a project (start/resume project state)
+   */
+  static async openProject(projectUuid: string): Promise<any> {
+    const url = `${API_ENDPOINTS.PROJECTS}/${projectUuid}/open`;
+
+    // Get the client session ID from the session manager
+    const clientSessionId = SessionManager.getClientSessionId();
+
+    if (!clientSessionId) {
+      throw new Error('No active session found. Please log in again.');
+    }
+
+    const payload = clientSessionId
+
+    console.log('Opening project with payload:', payload);
+
+    return ApiClient.post(url, payload);
   }
 }

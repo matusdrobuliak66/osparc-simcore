@@ -3,18 +3,8 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { authApi } from './auth-api';
 import { ApiError } from './api';
+import { SessionManager } from './session';
 import type { AuthState, AuthContextType, User } from '@/types/auth';
-
-// Generate a simple session ID
-const generateSessionId = (): string => {
-  return 'session-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-};
-
-// Session storage keys
-const SESSION_KEYS = {
-  USER: 'osparc-user',
-  SESSION_ID: 'osparc-session-id',
-} as const;
 
 // Auth reducer
 type AuthAction =
@@ -82,12 +72,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Check if user is authenticated by calling the backend
         const response = await authApi.checkAuth();
         if (response.authenticated && response.user) {
+          // Ensure we have a session if the user is authenticated
+          if (!SessionManager.hasActiveSession()) {
+            SessionManager.initializeSession();
+          }
           dispatch({ type: 'SET_USER', payload: response.user });
         } else {
+          // Clear any stale session if user is not authenticated
+          SessionManager.clearSession();
           dispatch({ type: 'SET_LOADING', payload: false });
         }
       } catch (error) {
         console.error('Error checking existing session:', error);
+        // Clear session on error
+        SessionManager.clearSession();
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
@@ -101,6 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     try {
       const response = await authApi.login({ email, password });
+
+      // Initialize session after successful login
+      SessionManager.initializeSession();
 
       // After successful login, check authentication status to get user data
       const authCheck = await authApi.checkAuth();
@@ -122,17 +123,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     dispatch({ type: 'SET_LOADING', payload: true });
 
     try {
-      const sessionId = generateSessionId(); // Just generate a dummy session ID
+      // Get the current session ID for logout
+      const clientSessionId = SessionManager.getClientSessionId();
 
-      // Call logout API
-      await authApi.logout({ client_session_id: sessionId });
+      if (clientSessionId) {
+        // Call logout API with the current session ID
+        await authApi.logout({ client_session_id: clientSessionId });
+      }
     } catch (error) {
       console.error('Logout API call failed:', error);
       // Continue with logout even if API call fails
     } finally {
-      // Clear any localStorage and state
-      localStorage.removeItem(SESSION_KEYS.USER);
-      localStorage.removeItem(SESSION_KEYS.SESSION_ID);
+      // Clear session and state
+      SessionManager.clearSession();
       dispatch({ type: 'LOGOUT' });
     }
   };

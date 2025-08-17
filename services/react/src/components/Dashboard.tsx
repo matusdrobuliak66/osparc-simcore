@@ -7,6 +7,7 @@ import ProjectCard from './ProjectCard';
 import DashboardFilters from './DashboardFilters';
 import CreateProjectModal from './CreateProjectModal';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
+import ProjectDetailsModal from './ProjectDetailsModal';
 // ...existing code...
 
 export default function Dashboard() {
@@ -15,6 +16,8 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
   const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
+  const [isProjectDetailsModalOpen, setIsProjectDetailsModalOpen] = useState(false);
+  const [selectedProjectUuid, setSelectedProjectUuid] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     total: 0,
     count: 0,
@@ -103,8 +106,9 @@ export default function Dashboard() {
     console.log('=== Dashboard handleWorkspaceSelect END ===');
     setFilters(newFilters);
   };  const handleProjectClick = (project: ProjectListItem) => {
-    // TODO: Navigate to project details or open project
     console.log('Project clicked:', project);
+    setSelectedProjectUuid(project.uuid);
+    setIsProjectDetailsModalOpen(true);
   };
 
   const handleLoadMore = () => {
@@ -289,6 +293,14 @@ export default function Dashboard() {
         isOpen={isCreateWorkspaceModalOpen}
         onClose={() => setIsCreateWorkspaceModalOpen(false)}
         onWorkspaceCreated={handleWorkspaceCreated}
+      />
+      <ProjectDetailsModal
+        isOpen={isProjectDetailsModalOpen}
+        onClose={() => {
+          setIsProjectDetailsModalOpen(false);
+          setSelectedProjectUuid(null);
+        }}
+        projectUuid={selectedProjectUuid}
       />
     </div>
   );
