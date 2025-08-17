@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -11,6 +11,7 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   NodeChange,
   EdgeChange,
   Connection,
@@ -286,16 +287,28 @@ function PipelineViewInner({ project, onUpdateNodePosition }: PipelineViewProps)
       levels.push(unprocessedNodes);
     }
 
-    // Position nodes based on levels
+    // Position nodes based on levels with better centering
     const nodeWidth = 280; // Width including spacing
     const nodeHeight = 180; // Height including spacing
-    const startX = 100;
-    const startY = 100;
+
+    // Calculate total dimensions for better centering
+    const maxNodesInLevel = Math.max(...levels.map(level => level.length));
+    const totalWidth = maxNodesInLevel * nodeWidth;
+    const totalHeight = levels.length * nodeHeight;
+
+    // Center the entire layout
+    const startX = Math.max(50, (800 - totalWidth) / 2); // Assume viewport ~800px wide
+    const startY = Math.max(50, (600 - totalHeight) / 2); // Assume viewport ~600px tall
 
     levels.forEach((level, levelIndex) => {
       const levelY = startY + levelIndex * nodeHeight;
+
+      // Center nodes within each level
+      const levelWidth = level.length * nodeWidth;
+      const levelStartX = startX + (totalWidth - levelWidth) / 2;
+
       level.forEach((nodeId, nodeIndex) => {
-        const levelX = startX + nodeIndex * nodeWidth;
+        const levelX = levelStartX + nodeIndex * nodeWidth;
 
         // Ensure we never set NaN values
         positions[nodeId] = {
@@ -414,6 +427,26 @@ function PipelineViewInner({ project, onUpdateNodePosition }: PipelineViewProps)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  // React Flow instance for programmatic control
+  const { fitView } = useReactFlow();
+
+  // Center and fit the view when nodes change
+  useEffect(() => {
+    if (nodes.length > 0) {
+      // Use a small delay to ensure DOM is updated
+      const timer = setTimeout(() => {
+        fitView({
+          padding: 50,
+          minZoom: 0.8,
+          maxZoom: 1.2,
+          duration: 800, // Smooth animation
+        });
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [nodes.length, fitView]);
+
   // Handle node position changes
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -499,15 +532,8 @@ function PipelineViewInner({ project, onUpdateNodePosition }: PipelineViewProps)
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Loose}
-          fitView
-          fitViewOptions={{
-            padding: 100,
-            includeHiddenNodes: false,
-            maxZoom: 1,
-          }}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-          minZoom={0.1}
-          maxZoom={1.5}
+          minZoom={0.2}
+          maxZoom={2}
           nodesDraggable={true}
           nodesConnectable={true}
           elementsSelectable={true}
@@ -574,6 +600,20 @@ function PipelineViewInner({ project, onUpdateNodePosition }: PipelineViewProps)
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               <span>Add Node</span>
+            </button>
+            <button
+              onClick={() => fitView({
+                padding: 50,
+                minZoom: 0.8,
+                maxZoom: 1.2,
+                duration: 800
+              })}
+              className="flex items-center space-x-2 px-3 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              <span>Center View</span>
             </button>
             <button className="flex items-center space-x-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
