@@ -79,4 +79,5 @@ export interface CreateProjectData {
   description?: string;
   workbench?: Record<string, any>;
   accessRights?: Record<string, AccessRights>;
+  workspaceId?: string | number | null;
 }

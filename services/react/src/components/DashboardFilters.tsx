@@ -2,10 +2,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ProjectFilters } from '@/types/projects';
+import WorkspaceSwitcher from './WorkspaceSwitcher';
 
 interface DashboardFiltersProps {
-  filters: ProjectFilters;
-  onFiltersChange: (filters: ProjectFilters) => void;
+  filters: {
+    search?: string;
+    type?: 'all' | 'user' | 'template';
+  };
+  onFiltersChange: (filters: { search?: string; type?: 'all' | 'user' | 'template' }) => void;
+  currentWorkspaceId: string | null;
+  onWorkspaceSelect: (workspaceId: string | null, workspaceName?: string) => void;
   isLoading?: boolean;
 }
 
@@ -13,6 +19,8 @@ export default function DashboardFilters({
   filters,
   onFiltersChange,
   isLoading = false,
+  currentWorkspaceId,
+  onWorkspaceSelect,
 }: DashboardFiltersProps) {
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const previousSearchRef = useRef(filters.search);
@@ -29,17 +37,8 @@ export default function DashboardFilters({
     return () => clearTimeout(timer);
   }, [searchTerm]); // Only depend on searchTerm, not the entire filters object
 
-  const handleWorkspaceChange = (workspaceType: 'private' | 'shared') => {
-    const workspaceId = workspaceType === 'private' ? null : undefined;
-    onFiltersChange({ ...filters, workspaceId });
-  };
-
   const handleTypeChange = (type: 'all' | 'user' | 'template') => {
     onFiltersChange({ ...filters, type });
-  };
-
-  const getCurrentWorkspaceType = (): 'private' | 'shared' => {
-    return filters.workspaceId === null ? 'private' : 'shared';
   };
 
   return (
@@ -91,47 +90,16 @@ export default function DashboardFilters({
 
         {/* Right side - Workspace Selection */}
         <div className="flex-shrink-0">
-          <div className="flex rounded-md bg-gray-100 p-1">
-            <button
-              type="button"
-              onClick={() => handleWorkspaceChange('private')}
-              disabled={isLoading}
-              className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:cursor-not-allowed ${
-                getCurrentWorkspaceType() === 'private'
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Private
-            </button>
-            <button
-              type="button"
-              onClick={() => handleWorkspaceChange('shared')}
-              disabled={isLoading}
-              className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:cursor-not-allowed ${
-                getCurrentWorkspaceType() === 'shared'
-                  ? 'bg-white text-primary-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-              </svg>
-              Shared
-            </button>
-          </div>
+          <WorkspaceSwitcher
+            currentWorkspaceId={currentWorkspaceId}
+            onWorkspaceSelect={onWorkspaceSelect}
+            isLoading={isLoading}
+          />
         </div>
       </div>
 
       {/* Active filters indicator */}
-      {(filters.search || filters.type !== 'all') && (
+      {(filters.search || (filters.type && filters.type !== 'all')) && (
         <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
           <span>Active filters:</span>
           {filters.search && (

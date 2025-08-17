@@ -7,7 +7,7 @@ import ProjectCard from './ProjectCard';
 import DashboardFilters from './DashboardFilters';
 import CreateProjectModal from './CreateProjectModal';
 import CreateWorkspaceModal from './CreateWorkspaceModal';
-import WorkspaceSelector from './WorkspaceSelector';
+// ...existing code...
 
 export default function Dashboard() {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
@@ -22,6 +22,10 @@ export default function Dashboard() {
     offset: 0,
   });
 
+  // Current workspace state - null means private workspace, string means shared workspace ID
+  const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(null);
+  const [currentWorkspaceName, setCurrentWorkspaceName] = useState<string>('Private Workspace');
+
   const [filters, setFilters] = useState<ProjectFilters>({
     type: 'user', // Default to user projects (studies)
     workspaceId: null, // Start with private workspace (null = private)
@@ -29,10 +33,6 @@ export default function Dashboard() {
     limit: 20,
     offset: 0,
   });
-
-  // Track if we're in shared mode and if a workspace has been selected
-  const [isSharedMode, setIsSharedMode] = useState(false);
-  const [selectedSharedWorkspaceId, setSelectedSharedWorkspaceId] = useState<string | null>(null);
 
   const loadProjects = useCallback(async (currentFilters: ProjectFilters) => {
     try {
@@ -72,17 +72,7 @@ export default function Dashboard() {
 
   const handleFiltersChange = (newFilters: ProjectFilters) => {
     setFilters({ ...newFilters, offset: 0 }); // Reset to first page when filters change
-
-    // Check if workspace mode changed
-    if (newFilters.workspaceId === null && isSharedMode) {
-      // Switched to private mode
-      setIsSharedMode(false);
-      setSelectedSharedWorkspaceId(null);
-    } else if (newFilters.workspaceId === undefined && !isSharedMode) {
-      // Switched to shared mode but no workspace selected yet
-      setIsSharedMode(true);
-      setSelectedSharedWorkspaceId(null);
-    }
+    setCurrentWorkspaceId(typeof newFilters.workspaceId === 'string' ? newFilters.workspaceId : null);
   };
 
   const handleProjectCreated = () => {
@@ -95,8 +85,10 @@ export default function Dashboard() {
     console.log('Workspace created successfully');
   };
 
-  const handleWorkspaceSelect = (workspaceId: string | null) => {
-    setSelectedSharedWorkspaceId(workspaceId);
+  const handleWorkspaceSelect = (workspaceId: string | null, workspaceName?: string) => {
+    setCurrentWorkspaceId(workspaceId);
+    setCurrentWorkspaceName(workspaceName || (workspaceId ? 'Shared Workspace' : 'Private Workspace'));
+
     // Update filters to load projects from the selected workspace
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -116,13 +108,7 @@ export default function Dashboard() {
   };
 
   const getWorkspaceDisplayName = () => {
-    if (filters.workspaceId === null) {
-      return 'Private Workspace';
-    } else if (isSharedMode && selectedSharedWorkspaceId === null) {
-      return 'Shared Workspaces';
-    } else {
-      return 'Shared Workspace';
-    }
+    return currentWorkspaceName;
   };
 
   if (error) {
@@ -184,11 +170,9 @@ export default function Dashboard() {
           </div>
         </div>
         <p className="text-gray-600">
-          {filters.workspaceId === null
+          {currentWorkspaceId === null
             ? 'Your personal projects and studies'
-            : isSharedMode && selectedSharedWorkspaceId === null
-            ? 'Select a shared workspace to view its projects'
-            : 'Shared projects across your organization'}
+            : 'Projects shared within your organization'}
         </p>
       </div>
 
@@ -197,19 +181,12 @@ export default function Dashboard() {
         filters={filters}
         onFiltersChange={handleFiltersChange}
         isLoading={loading}
+        currentWorkspaceId={currentWorkspaceId}
+        onWorkspaceSelect={handleWorkspaceSelect}
       />
 
-      {/* Workspace Selector - Show when in shared mode but no workspace selected */}
-      {isSharedMode && selectedSharedWorkspaceId === null && (
-        <WorkspaceSelector
-          selectedWorkspaceId={selectedSharedWorkspaceId}
-          onWorkspaceSelect={handleWorkspaceSelect}
-          isLoading={loading}
-        />
-      )}
-
       {/* Loading State */}
-      {loading && projects.length === 0 && (filters.workspaceId !== undefined || !isSharedMode) && (
+      {loading && projects.length === 0 && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -218,8 +195,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Projects Grid - Only show when we have a valid workspace selection */}
-      {(!loading || projects.length > 0) && (filters.workspaceId !== undefined || !isSharedMode) ? (
+      {/* Projects Grid */}
+      {!loading || projects.length > 0 ? (
         <>
           {projects.length === 0 ? (
             <div className="text-center py-12">
@@ -300,6 +277,8 @@ export default function Dashboard() {
         isOpen={isCreateProjectModalOpen}
         onClose={() => setIsCreateProjectModalOpen(false)}
         onProjectCreated={handleProjectCreated}
+        workspaceId={currentWorkspaceId}
+        workspaceName={currentWorkspaceName}
       />
       <CreateWorkspaceModal
         isOpen={isCreateWorkspaceModalOpen}

@@ -8,16 +8,21 @@ interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProjectCreated: () => void;
+  workspaceId?: string | null;
+  workspaceName?: string;
 }
 
 export default function CreateProjectModal({
   isOpen,
   onClose,
   onProjectCreated,
+  workspaceId = null,
+  workspaceName = 'Private Workspace',
 }: CreateProjectModalProps) {
   const [formData, setFormData] = useState<CreateProjectData>({
     name: '',
     description: '',
+    workspaceId: workspaceId,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +73,12 @@ export default function CreateProjectModal({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Project</h2>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Create New Project</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Creating in: {workspaceName}
+            </p>
+          </div>
           <button
             onClick={handleClose}
             disabled={isLoading}
