@@ -158,6 +158,7 @@ export default function Dashboard() {
             {getWorkspaceDisplayName()}
           </h1>
           <div className="flex gap-2">
+            {/* React Flow Demo button hidden
             <a
               href="/demo"
               className="inline-flex items-center px-4 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -168,6 +169,7 @@ export default function Dashboard() {
               </svg>
               View React Flow Demo
             </a>
+            */}
             <button
               onClick={() => setIsCreateWorkspaceModalOpen(true)}
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
