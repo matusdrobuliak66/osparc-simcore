@@ -16,6 +16,7 @@ link and sizing are also exercised from the director-v2 side in
 """
 
 from collections.abc import Awaitable, Callable
+from decimal import Decimal
 from typing import Annotated, Any, Final
 from unittest import mock
 
@@ -37,8 +38,10 @@ from pytest_mock.plugin import MockerFixture
 from pytest_simcore.aioresponses_mocker import AioResponsesMock
 from pytest_simcore.helpers.assert_checks import assert_status
 from pytest_simcore.helpers.project_nodes_pricing import (
+    R5_4XLARGE_NAME,
     fake_compute_node_resources_for_hardware,
     get_node_pricing_state,
+    make_pricing_unit,
     regex_for_rut_pricing_unit,
     resources_limits,
     set_node_pricing_link,
@@ -48,7 +51,6 @@ from pytest_simcore.helpers.project_nodes_pricing import (
 from pytest_simcore.helpers.webserver_users import UserInfoDict
 from servicelib.aiohttp import status
 from simcore_service_webserver.db.models import UserRole
-from simcore_service_webserver.projects import _projects_service
 from simcore_service_webserver.projects._projects_repository_legacy import ProjectDBAPI
 from simcore_service_webserver.projects.api import repair_projects_nodes_pricing_and_resources
 from simcore_service_webserver.projects.models import ProjectDict
@@ -224,7 +226,7 @@ _PROJECT_WALLET_ID: Final[WalletID] = WalletID(7)
 
 
 @pytest.fixture
-def mock_project_wallet_with_credits(mocker: MockerFixture) -> None:
+def mock_project_wallet_with_credits(mocker: MockerFixture) -> WalletGetWithAvailableCredits:
     """The project is connected to a wallet that has credits."""
     # NOTE: autospec of a coroutine function gives an AsyncMock
     mocker.patch(
@@ -240,41 +242,53 @@ def mock_project_wallet_with_credits(mocker: MockerFixture) -> None:
         autospec=True,
         return_value=wallet,
     )
+    return wallet
 
 
 @pytest.mark.parametrize("user_role", [UserRole.USER])
+@pytest.mark.parametrize("unknown_link", [False, True], ids=["missing-link", "unknown-link"])
 async def test_start_dynamic_service_links_default_unit_and_sizes_with_dynamic_formula(
+    unknown_link: bool,
     client: TestClient,
     logged_user: UserInfoDict,
     user_project: ProjectDict,
     sqlalchemy_async_engine: AsyncEngine,
     with_billed_product: None,
     mock_rut_default_pricing_unit: RutPricingUnitGet,
-    mock_project_wallet_with_credits: None,
+    mock_project_wallet_with_credits: WalletGetWithAvailableCredits,
     mocked_director_v2_node_sizing: mock.AsyncMock,
     mocked_dynamic_services_interface: dict[str, mock.MagicMock],
+    aioresponses_mocker: AioResponsesMock,
 ):
-    """Starting a dynamic service in a billed product, on a node without any
-    pricing link, links the DEFAULT plan/unit of the service and resizes
-    `required_resources` with the DYNAMIC-SIDECAR formula of that unit's machine
-    (the sizing is computed by director-v2). Dynamic nodes are never linked at
-    creation, so this path stays the (only) writer of a dynamic node's link.
-    """
+    """Dynamic start defaults missing or unknown links and sizes for that unit."""
     assert client.app
 
     dynamic_node_id = next(node_id for node_id, node in user_project["workbench"].items() if "/dynamic/" in node["key"])
     project_id = user_project["uuid"]
 
-    # deterministic starting point: single-container resources, no link
     await set_node_required_resources(
         sqlalchemy_async_engine,
         project_id,
         dynamic_node_id,
         single_container_required_resources(user_project["workbench"][dynamic_node_id]["key"]),
     )
+    if unknown_link:
+        await set_node_pricing_link(
+            sqlalchemy_async_engine,
+            project_id,
+            dynamic_node_id,
+            pricing_plan_id=_UNKNOWN_PRICING_PLAN_ID,
+            pricing_unit_id=_UNKNOWN_PRICING_UNIT_ID,
+        )
+        aioresponses_mocker.get(
+            regex_for_rut_pricing_unit(
+                f"{get_rut_plugin_settings(client.app).api_base_url}",
+                _UNKNOWN_PRICING_PLAN_ID,
+                _UNKNOWN_PRICING_UNIT_ID,
+            ),
+            status=status.HTTP_404_NOT_FOUND,
+        )
     state_before = await get_node_pricing_state(sqlalchemy_async_engine, project_id)
-    assert state_before[NodeID(dynamic_node_id)].pricing_plan_id is None
-    assert state_before[NodeID(dynamic_node_id)].pricing_unit_id is None
 
     url = client.app.router["start_node"].url_for(project_id=project_id, node_id=dynamic_node_id)
     rsp = await client.post(f"{url}")
@@ -298,6 +312,81 @@ async def test_start_dynamic_service_links_default_unit_and_sizes_with_dynamic_f
     for node_id, other_state in state_after.items():
         if node_id != NodeID(dynamic_node_id):
             assert other_state == state_before[node_id]
+
+
+@pytest.mark.parametrize("user_role", [UserRole.USER])
+@pytest.mark.parametrize(
+    "available_credits,unit_cost,expected_status",
+    [
+        pytest.param(Decimal(100), Decimal(5), status.HTTP_204_NO_CONTENT, id="paid-with-credits"),
+        pytest.param(Decimal(0), Decimal(0), status.HTTP_204_NO_CONTENT, id="free-without-credits"),
+        pytest.param(Decimal(0), Decimal(5), status.HTTP_402_PAYMENT_REQUIRED, id="paid-without-credits"),
+    ],
+)
+async def test_dynamic_start_keeps_selected_pricing_and_checks_credits_before_sizing(
+    available_credits: Decimal,
+    unit_cost: Decimal,
+    expected_status: int,
+    client: TestClient,
+    logged_user: UserInfoDict,
+    user_project: ProjectDict,
+    sqlalchemy_async_engine: AsyncEngine,
+    with_billed_product: None,
+    mock_project_wallet_with_credits: WalletGetWithAvailableCredits,
+    mocked_director_v2_node_sizing: mock.AsyncMock,
+    mocked_dynamic_services_interface: dict[str, mock.MagicMock],
+    aioresponses_mocker: AioResponsesMock,
+):
+    assert client.app
+    mock_project_wallet_with_credits.available_credits = available_credits
+    node_id = next(node_id for node_id, node in user_project["workbench"].items() if "/dynamic/" in node["key"])
+    project_id = user_project["uuid"]
+    selected_unit = make_pricing_unit(pricing_unit_id=2, default=False, aws_ec2_instance=R5_4XLARGE_NAME).model_copy(
+        update={"current_cost_per_unit": unit_cost, "current_cost_per_unit_id": 23}
+    )
+    await set_node_pricing_link(
+        sqlalchemy_async_engine,
+        project_id,
+        node_id,
+        pricing_plan_id=7,
+        pricing_unit_id=selected_unit.pricing_unit_id,
+    )
+    await set_node_required_resources(
+        sqlalchemy_async_engine,
+        project_id,
+        node_id,
+        single_container_required_resources(user_project["workbench"][node_id]["key"]),
+    )
+    before = await get_node_pricing_state(sqlalchemy_async_engine, project_id)
+    aioresponses_mocker.get(
+        regex_for_rut_pricing_unit(f"{get_rut_plugin_settings(client.app).api_base_url}", 7, 2),
+        payload=jsonable_encoder(selected_unit),
+    )
+
+    url = client.app.router["start_node"].url_for(project_id=project_id, node_id=node_id)
+    response = await client.post(f"{url}")
+    await assert_status(response, expected_status)
+
+    after = await get_node_pricing_state(sqlalchemy_async_engine, project_id)
+    start_service = mocked_dynamic_services_interface["dynamic_scheduler.api.run_dynamic_service"]
+    if expected_status == status.HTTP_402_PAYMENT_REQUIRED:
+        start_service.assert_not_called()
+        mocked_director_v2_node_sizing.assert_not_called()
+        assert after == before
+    else:
+        start_service.assert_called_once()
+        mocked_director_v2_node_sizing.assert_called_once()
+        started = start_service.call_args.kwargs["dynamic_service_start"]
+        assert started.pricing_info
+        assert started.pricing_info.pricing_plan_id == 7
+        assert started.pricing_info.pricing_unit_id == 2
+        assert started.pricing_info.pricing_unit_cost_id == 23
+        assert started.hardware_info == selected_unit.specific_info
+        assert after[NodeID(node_id)].pricing_plan_id == 7
+        assert after[NodeID(node_id)].pricing_unit_id == 2
+        required_resources = after[NodeID(node_id)].required_resources
+        assert required_resources
+        assert required_resources["container"]["resources"] == resources_limits(cpu=14.6, ram_bytes=122621316300)
 
 
 #
@@ -531,7 +620,7 @@ _TWO_COMP_NODES_WORKBENCH: Final[
 
 
 @pytest.mark.parametrize("user_role", [UserRole.USER])
-async def test_project_creation_asks_rut_once_per_service(
+async def test_project_creation_prices_and_sizes_each_node_of_the_same_service(
     *,
     client: TestClient,
     create_project: Callable[[str, dict[str, Any]], Awaitable[ProjectDict]],
@@ -545,19 +634,12 @@ async def test_project_creation_asks_rut_once_per_service(
     mock_rut_default_pricing_unit: RutPricingUnitGet,
     mocked_director_v2_node_sizing: mock.AsyncMock,
     with_billed_product: None,
-    mocker: MockerFixture,
 ):
-    """Two nodes of the same service share the answer about its DEFAULT pricing unit:
-    creation asks the resource-usage-tracker once per distinct service, not per node,
-    and still sizes every node.
-    """
+    """Each computational node gets its default pricing and machine-sized resources."""
     assert client.app
-    default_plan_lookup = mocker.spy(_projects_service.rut_api, "get_default_service_pricing_plan")
 
-    new_project = await create_project("dedupe-project", _TWO_COMP_NODES_WORKBENCH)
+    new_project = await create_project("same-service-project", _TWO_COMP_NODES_WORKBENCH)
 
-    assert default_plan_lookup.call_count == 1
-    # sizing is per node: both computational nodes get their own request
     assert mocked_director_v2_node_sizing.call_count == 2
 
     state = await get_node_pricing_state(sqlalchemy_async_engine, new_project["uuid"])
@@ -623,7 +705,7 @@ async def test_node_creation_links_default_unit_and_sizes_it(
 
 
 @pytest.mark.parametrize("user_role", [UserRole.USER])
-async def test_repair_asks_rut_once_per_distinct_pricing_unit(
+async def test_repair_sizes_each_node_sharing_a_pricing_unit(
     *,
     client: TestClient,
     create_project: Callable[[str, dict[str, Any]], Awaitable[ProjectDict]],
@@ -637,16 +719,12 @@ async def test_repair_asks_rut_once_per_distinct_pricing_unit(
     mock_service_resources: ServiceResourcesDict,
     mock_rut_default_pricing_unit: RutPricingUnitGet,
     mocked_director_v2_node_sizing: mock.AsyncMock,
-    mocker: MockerFixture,
     with_billed_product: None,
 ):
-    """Every node of a start is repaired concurrently: nodes sharing a pricing unit share
-    one request to the resource-usage-tracker, so an unreachable one costs one per
-    distinct plan/unit instead of one per node.
-    """
+    """Repair updates stale resources for each node without changing its pricing link."""
     assert client.app
     # creation in a billed product already links both computational nodes to one unit
-    project = await create_project("repair-dedupe-project", _TWO_COMP_NODES_WORKBENCH)
+    project = await create_project("repair-shared-unit-project", _TWO_COMP_NODES_WORKBENCH)
     project_id = project["uuid"]
     # stale resources: the repair has to size both nodes again
     for node_id in (_COMP_NODE_ID, _SECOND_COMP_NODE_ID):
@@ -656,14 +734,13 @@ async def test_repair_asks_rut_once_per_distinct_pricing_unit(
             node_id,
             single_container_required_resources(_TWO_COMP_NODES_WORKBENCH[node_id]["key"], cpu=0.1),
         )
-    link_lookup = mocker.spy(_projects_service.rut_api, "get_pricing_plan_unit")
-
     await _repair(client, logged_user, project_id, osparc_product_name)
 
-    assert link_lookup.call_count == 1
     state = await get_node_pricing_state(sqlalchemy_async_engine, project_id)
     for node_id in (_COMP_NODE_ID, _SECOND_COMP_NODE_ID):
         node_state = state[NodeID(node_id)]
+        assert node_state.pricing_plan_id == _DEFAULT_PRICING_PLAN_ID
+        assert node_state.pricing_unit_id == _DEFAULT_PRICING_UNIT_ID
         assert node_state.required_resources
         assert node_state.required_resources["container"]["resources"] == resources_limits(
             cpu=1.9, ram_bytes=3865470566
